@@ -16,9 +16,9 @@ exports.createUser = async (req, res, next) => {
   // Hash Password
   req.body.password = bcrypt.hashSync(req.body.password, parseInt(process.env.SALTROUNDS))
 
-  const user = await User.create(req.body)
-  // Remove Password Propery
-  user.password = undefined
+  let user = await User.create(req.body)
+  user = user.get({ plain: true })
+  delete user.password
 
   res.send({ msg: 'Data Inserted', data: user })
 }

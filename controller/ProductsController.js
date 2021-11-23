@@ -1,5 +1,6 @@
 const Validator = require('fastest-validator')
 const { Product } = require('../models')
+const productData = require('../query/Product.model')
 const v = new Validator()
 
 exports.halo = (req, res, next) => {
@@ -21,4 +22,13 @@ exports.createProduct = async (req, res, next) => {
 
   const product = await Product.create(req.body)
   res.send(product)
+}
+
+exports.getProductById = async (req, res, next) => {
+  const product = await productData.getById(req.params.id)
+  if (product === null) {
+    res.json({ msg: 'Product not found', status: 404, data: null })
+  } else {
+    res.json({ msg: 'Product found', status: 200, data: product })
+  }
 }
