@@ -8,7 +8,8 @@ router.get('/', (req, res, next) => {
 })
 
 router.post('/', UsersController.createUser)
-router.get('/me', (req, res, next) => {
-  res.send(`Halo ${process.env.APP_NAME}`)
-})
+router.get('/dummy/', UsersController.createDummy)
+router.get('/paginated/', UsersController.getPaginatedData)
+router.get('/:id/products/', UsersController.getProductsByUserId)
+router.get('/:id/', UsersController.getById)
 module.exports = router

@@ -7,6 +7,8 @@ const basename = path.basename(__filename)
 const env = process.env.NODE_ENV || 'development'
 const configPath = [__dirname, '/../config/config.js']
 const config = require(configPath.join(''))[env]
+// const User = require('./Users')
+// const Product = require('./Products')
 const db = {}
 
 let sequelize
@@ -25,7 +27,6 @@ fs
     const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes)
     db[model.name] = model
   })
-
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {
     db[modelName].associate(db)
@@ -34,5 +35,6 @@ Object.keys(db).forEach(modelName => {
 
 db.sequelize = sequelize
 db.Sequelize = Sequelize
-
+db.User.hasMany(db.Product, { foreignKey: 'user_id' })
+db.Product.belongsTo(db.User, { foreignKey: 'user_id' })
 module.exports = db

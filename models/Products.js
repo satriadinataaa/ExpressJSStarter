@@ -10,6 +10,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false
     },
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
     brand: {
       type: DataTypes.STRING,
       allowNull: false
@@ -24,9 +28,13 @@ module.exports = (sequelize, DataTypes) => {
     updatedAt: {
       type: DataTypes.DATE,
       allowNull: false
+    },
+    deletedAt: {
+      type: DataTypes.DATE,
+      allowNull: true
     }
   }, {
-    tableName: 'products'
+    tableName: 'products', paranoid: true
   })
 
   return Product
