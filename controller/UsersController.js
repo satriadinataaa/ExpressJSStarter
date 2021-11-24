@@ -6,6 +6,7 @@ const v = new Validator()
 const { Op } = require('sequelize')
 const faker = require('faker')
 const db = require('../models')
+const jwt = require('jsonwebtoken')
 
 exports.createUser = async (req, res, next) => {
   const schema = {
@@ -97,7 +98,7 @@ exports.createDummy = async (req, res, next) => {
   for (let i = 0; i < 200; i++) {
     const randomName = faker.name.findName() // Rowan Nikolaus
     const randomEmail = faker.internet.email() // Kassandra.Haley@erich.biz
-    const password = bcrypt.hashSync(randomName, parseInt(process.env.SALTROUNDS))
+    const password = bcrypt.hashSync('123456', parseInt(process.env.SALTROUNDS))
     const userInsert = {
       name: randomName,
       email: randomEmail,
@@ -106,4 +107,32 @@ exports.createDummy = async (req, res, next) => {
     await User.create(userInsert)
   }
   res.send({ msg: 'Data Inserted' })
+}
+
+exports.login = async (req, res, next) => {
+  const schema = {
+    email: 'email',
+    password: 'string|min:6|max:12'
+  }
+  const validate = v.validate(req.body, schema)
+  if (validate.length) {
+    return res.status(400).json(validate)
+  }
+  let user = await User.findOne({
+    where: {
+      email: req.body.email
+    }
+  })
+
+  if (!user) {
+    res.status(400).json({ msg: 'User Not Found' })
+  }
+  user = user.get({ plain: true })
+  const checkPassword = bcrypt.compare(req.body.password, user.password)
+  if (!checkPassword) {
+    res.status(400).json({ msg: 'Wrong Password' })
+  }
+  user.password = undefined
+  const token = jwt.sign(user, 'secret', { expiresIn: '1h' })
+  res.send({ msg: 'Success Login', data: { token, user } })
 }
